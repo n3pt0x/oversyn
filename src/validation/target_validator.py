@@ -7,7 +7,7 @@ class TargetValidator():
         self.target = target
 
     def is_valid_ip(self):
-        """Return if the name of the target is valid as anj IP address (IPv4 or IPv6)"""
+        """Return if the name of the target is valid as an IP address (IPv4 or IPv6)"""
         try:
             if socket.inet_pton(socket.AF_INET, self.target):
                 return True
@@ -30,16 +30,16 @@ class TargetValidator():
             print(f"Trying to contact {self.target} ...\n")
 
             # If ip format
-            if self.is_valid_ip():
+        if self.is_valid_ip():
+            if Config.get_verbose():
+                print(f'{self.target} is valide !')
+            return True
+        else:
+            # if hostname format, trying to get ip or dns
+            if self.is_valid_hostname():
                 if Config.get_verbose():
                     print(f'{self.target} is valide !')
                 return True
             else:
-                # if hostname format, trying to get ip or dns
-                if self.is_valid_hostname():
-                    if Config.get_verbose():
-                        print(f'{self.target} is valide !')
-                    return True
-                else:
-                    print(f"Impossible to contact {self.target} ...")
-                    return False
+                print(f"Impossible to contact {self.target} ...")
+                return False
