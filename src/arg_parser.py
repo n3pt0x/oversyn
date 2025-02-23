@@ -21,7 +21,6 @@ class ArgParser():
             "-p",
             "--port",
             type=int,
-            nargs="+",
             help="Port of the target number"
         )
 
@@ -31,6 +30,14 @@ class ArgParser():
             type=int,
             default=None,
             help="Number of requests, default set on infinite"
+        )
+
+        self.parser.add_argument(
+            "-a",
+            "--attack",
+            choices=['tcp', 'udp', 'http'],
+            required=True,
+            help="Choose the attack type: TCP or UDP flood, or HTTP"
         )
 
         self.parser.add_argument(
