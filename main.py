@@ -3,28 +3,39 @@ from src.arg_parser import ArgParser
 from src import TargetValidator
 from src.config import Config
 from src.dos import Dos, TCP, UDP
+from src.utils import *
 
 
 def main():
+    parser = ArgParser()
+    args = parser.parse_args()
+
+    config = Config()
+    config.init(args)
+    
     trying_connection()
 
 
-def trying_connection():
-    parser = ArgParser()
-    args = parser.parse_args()
-    Config().init(args)
+def resume():
+    config = Config()
+    color_text(
+        'yellow', f'target: {config.target}, port: {config.port}, attack: {config.attack}, packet number: {config.count if config.count else "Infinite"},\n')
 
-    target = args.target
-    target_port = args.port
-    attack_type = args.attack
+
+def trying_connection():
+    config = Config()
+    target = config.target
+    target_port = config.port
+    attack_type = config.attack
+    print(f'{config.port}')
+    resume()
 
     target_validator = TargetValidator(target)
     target_validated = target_validator.validate()
 
     if target_validated:
-        print('Continue')
-
-        attack(target, target_port, attack_type)
+        print('Packet sending ...')
+        # attack(target, target_port, attack_type)
     else:
         print('End !')
 

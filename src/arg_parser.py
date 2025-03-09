@@ -12,6 +12,13 @@ class ArgParser():
         )
 
         self.parser.add_argument(
+            "-v",
+            "--verbose",
+            action="store_true",
+            help="Used the verbose mode"
+        )
+
+        self.parser.add_argument(
             "target",
             type=str,
             help="The IP address of the target"
@@ -21,7 +28,16 @@ class ArgParser():
             "-p",
             "--port",
             type=int,
+            required=True,
             help="Port of the target number"
+        )
+
+        self.parser.add_argument(
+            "-a",
+            "--attack",
+            choices=['tcp', 'udp', 'http', 'https'],
+            required=True,
+            help="Choose the attack type: TCP or UDP flood, or HTTP(S)"
         )
 
         self.parser.add_argument(
@@ -30,21 +46,6 @@ class ArgParser():
             type=int,
             default=None,
             help="Number of requests, default set on infinite"
-        )
-
-        self.parser.add_argument(
-            "-a",
-            "--attack",
-            choices=['tcp', 'udp', 'http'],
-            required=True,
-            help="Choose the attack type: TCP or UDP flood, or HTTP"
-        )
-
-        self.parser.add_argument(
-            "-v",
-            "--verbose",
-            action="store_true",
-            help="Used the verbose mode"
         )
 
     def parse_args(self):

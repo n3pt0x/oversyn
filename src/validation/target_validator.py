@@ -1,6 +1,6 @@
 from src.config import Config
 import socket
-
+from src.utils import color_text
 
 class TargetValidator():
     def __init__(self, target):
@@ -27,19 +27,19 @@ class TargetValidator():
     def validate(self):
         """Return if target is valide"""
         if Config.get_verbose():
-            print(f"Trying to contact {self.target} ...\n")
+            color_text("green", f"[+] Trying to contact {self.target}")
 
             # If ip format
         if self.is_valid_ip():
             if Config.get_verbose():
-                print(f'{self.target} is valide !')
+                color_text("green", f"[+] {self.target} is valide !\n")
             return True
         else:
             # if hostname format, trying to get ip or dns
             if self.is_valid_hostname():
                 if Config.get_verbose():
-                    print(f'{self.target} is valide !')
+                    color_text("green", f"[+] {self.target} is valide !\n")
                 return True
             else:
-                print(f"Impossible to contact {self.target} ...")
+                color_text("red", f"[-] Impossible to contact {self.target}\n")
                 return False
