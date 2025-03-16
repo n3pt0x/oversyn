@@ -2,7 +2,7 @@ from src import show_banner
 from src.arg_parser import ArgParser
 from src import TargetValidator
 from src.config import Config
-from src.dos import Dos, TCP, UDP
+from src.dos import HTTPDos, TCPDos, UDPDos, TCP, UDP
 from src.utils import *
 
 
@@ -12,7 +12,7 @@ def main():
 
     config = Config()
     config.init(args)
-    
+
     trying_connection()
 
 
@@ -27,7 +27,7 @@ def trying_connection():
     target = config.target
     target_port = config.port
     attack_type = config.attack
-    print(f'{config.port}')
+    http_method = config.method
     resume()
 
     target_validator = TargetValidator(target)
@@ -35,22 +35,24 @@ def trying_connection():
 
     if target_validated:
         print('Packet sending ...')
-        # attack(target, target_port, attack_type)
+        attack(target, target_port, attack_type, http_method=http_method)
     else:
         print('End !')
 
 
-def attack(target, target_port, attack_type):
+def attack(target, target_port, attack_type, http_method=None):
     """
     target
     target_port
     attack_type: attack method like: UDP, HTTP
     """
     if attack_type == 'udp':
-        dos_attacks = Dos(target, target_port, UDP, thread_number=6)
+        dos_attacks = UDPDos(target, target_port, UDP, thread_number=6)
         return dos_attacks.start_attack()
     elif attack_type == 'http':
-        print('HTTP')
+        dos_attacks = HTTPDos(target, target_port, 'http',
+                          http_method=http_method, thread_number=6)
+        return dos_attacks.start_attack()
 
 
 if __name__ == "__main__":

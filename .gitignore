@@ -1,2 +1,4 @@
-src/__pycache__/
-src/validation/__pycache__/
+**/__pycache__/*
+*.pyc
+*.pyo
+*.pyd

