@@ -41,6 +41,14 @@ class ArgParser():
         )
 
         self.parser.add_argument(
+            "-m",
+            "--method",
+            choices=['get', 'post'],
+            type=str,
+            help="Choise your HTTP method"
+        )
+
+        self.parser.add_argument(
             "-c",
             "--count",
             type=int,
@@ -50,4 +58,10 @@ class ArgParser():
 
     def parse_args(self):
         """return args list"""
+        args = self.parser.parse_args()
+
+        if (args.attack == 'http' or args.attack == 'https') and not args.method:
+            self.parser.error(
+                'The option --method (-m) is required with http(s) attacks')
+
         return self.parser.parse_args()

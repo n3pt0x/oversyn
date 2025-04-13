@@ -8,6 +8,7 @@ class Config:
             cls._instance.target = None
             cls._instance.port = None
             cls._instance.attack = None
+            cls._instance.method = None
             cls._instance.count = None
         return cls._instance
 
