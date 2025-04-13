@@ -182,9 +182,9 @@ class HTTPDos():
                         thread = Thread(target=self.http_flood())
                         threads.append(thread)
                         thread.start()
-                else:
-                    print('Bad method')
-                    return
+            else:
+                print('Bad method')
+                return
 
         except Exception as e:
             color_text('red', f'[!] Error: {e}')
