@@ -1,34 +1,28 @@
 from src import show_banner
-from src.arg_parser import ArgParser
+from src.arg_parser import arg_parser
 from src import TargetValidator
-from src.config import Config
 from src.dos import HTTPDos, TCPDos, UDPDos, TCP, UDP
 from src.utils import *
 
 
 def main():
-    parser = ArgParser()
-    args = parser.parse_args()
+    args = arg_parser()
 
-    config = Config()
-    config.init(args)
-
-    trying_connection()
+    trying_connection(args)
 
 
-def resume():
-    config = Config()
+def resume(args):
+
     color_text(
-        'yellow', f'target: {config.target}, port: {config.port}, attack: {config.attack}, packet number: {config.count if config.count else "Infinite"},\n')
+        'yellow', f'target: {args.target}, port: {args.port}, attack: {args.attack}, packet number: {args.count if args.count else "Infinite"},\n')
 
 
-def trying_connection():
-    config = Config()
-    target = config.target
-    target_port = config.port
-    attack_type = config.attack
-    http_method = config.method
-    resume()
+def trying_connection(args):
+    target = args.target
+    target_port = args.port
+    attack_type = args.attack
+    http_method = args.method
+    resume(args)
 
     target_validator = TargetValidator(target)
     target_validated = target_validator.validate()
