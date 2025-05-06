@@ -7,7 +7,6 @@ from src.utils import *
 
 def main():
     args = arg_parser()
-
     trying_connection(args)
 
 
@@ -24,7 +23,7 @@ def trying_connection(args):
     http_method = args.method
     resume(args)
 
-    target_validator = TargetValidator(target)
+    target_validator = TargetValidator(args)
     target_validated = target_validator.validate()
 
     if target_validated:
