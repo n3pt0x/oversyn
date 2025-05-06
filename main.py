@@ -1,8 +1,7 @@
 from src import show_banner
 from src.arg_parser import arg_parser
 from src import TargetValidator
-from src.dos import HTTPDos, TCP, UDP
-from src.dos.socket_dos import SocketDos
+from src.dos import HTTPDos, SocketDos, TCP, UDP
 from src.utils import *
 
 
