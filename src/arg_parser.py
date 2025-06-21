@@ -65,8 +65,7 @@ def arg_parser():
 
     args = parser.parse_args()
 
-    if (args.attack == 'http' or args.attack == 'https') and not args.method:
-        parser.error(
-            'The option --method (-m) is required with http(s) attacks')
+    if (args.attack == 'http' or args.attack == 'https'):
+        args.method = input('Choice an HTTP method [GET, POST] : ').upper()
 
     return args

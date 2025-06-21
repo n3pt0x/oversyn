@@ -8,6 +8,5 @@ def color_text(color: str, text: str) -> str:
         "white": "\033[0m",
     }
 
-    # Par défaut en blanc si couleur inconnue
     color_code = colors.get(color.lower(), colors["white"])
     print(f"{color_code}{text}{colors['white']}")
