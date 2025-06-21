@@ -55,6 +55,14 @@ def arg_parser():
         help="Number of requests, default set on infinite"
     )
 
+    parser.add_argument(
+        "-t",
+        "--thread",
+        type=int,
+        default=None,
+        help="Number of threads, default set to 20"
+    )
+
     args = parser.parse_args()
 
     if (args.attack == 'http' or args.attack == 'https') and not args.method:
