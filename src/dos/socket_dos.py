@@ -17,7 +17,6 @@ class SocketDos():
         self.udp_size_bytes = udp_size_bytes
         self.thread_number = thread_number
         self.counter = itertools.count(1)
-        self.start = time.time()
 
     def tcp_flood(self):
         try:
@@ -46,8 +45,6 @@ class SocketDos():
         if request_nb % 10_000 == 0:
             sys.stdout.write(f'{request_nb} request send !\r\n')
             sys.stdout.flush()
-            end = time.time()
-            print(end - self.start)
 
     def start_attack(self):
         """

