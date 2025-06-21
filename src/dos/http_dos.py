@@ -91,8 +91,8 @@ class HTTPDos():
             return True  # SSL valid
         except:
             color_text(
-                'red', '\r\n[!] HTTPS is not available, test on http port 80 !\r\n')
-            self.target_port = 80  # if https is not valide, test on http port 80 by default
+                'red', "\r\n[!] HTTPS isn't available, test with http !\r\n")
+            self.attack = 'http'  # if https is not valide, test on http port 80 by default
 
             return False
 
