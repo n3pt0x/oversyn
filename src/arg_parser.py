@@ -1,4 +1,5 @@
 import argparse
+from src.config import DEFAULT_NUM_THREADS
 
 
 def arg_parser():
@@ -60,7 +61,7 @@ def arg_parser():
         "--thread",
         type=int,
         default=None,
-        help="Number of threads, default set to 20"
+        help=f"Number of threads, default set to {DEFAULT_NUM_THREADS}"
     )
 
     args = parser.parse_args()

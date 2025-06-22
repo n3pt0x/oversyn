@@ -1,7 +1,7 @@
 from src import show_banner
 from src.arg_parser import arg_parser
 from src import TargetValidator
-from src.dos import HTTPDos, SocketDos, TCP, UDP
+from src.dos import HTTPDos, SocketDos, TCP, UDP, DEFAULT_NUM_THREADS
 from src.utils import *
 
 
@@ -40,14 +40,16 @@ def attack(target, target_port, attack_type, http_method=None):
     attack_type: attack method like: UDP, HTTP
     """
     if attack_type == 'udp':
-        dos_attacks = SocketDos(target, target_port, UDP, thread_number=20)
+        dos_attacks = SocketDos(target, target_port, UDP,
+                                thread_number=DEFAULT_NUM_THREADS)
         return dos_attacks.start_attack()
     elif attack_type == 'tcp':
-        dos_attacks = SocketDos(target, target_port, TCP, thread_number=20)
+        dos_attacks = SocketDos(target, target_port, TCP,
+                                thread_number=DEFAULT_NUM_THREADS)
         return dos_attacks.start_attack()
     elif attack_type == 'http' or attack_type == 'https':
         dos_attacks = HTTPDos(target, target_port, attack_type,
-                              http_method=http_method, thread_number=6)
+                              http_method=http_method, thread_number=DEFAULT_NUM_THREADS)
         return dos_attacks.start_attack()
 
 
