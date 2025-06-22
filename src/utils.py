@@ -10,3 +10,9 @@ def color_text(color: str, text: str) -> str:
 
     color_code = colors.get(color.lower(), colors["white"])
     print(f"{color_code}{text}{colors['white']}")
+
+
+def resume(args):
+
+    color_text(
+        'yellow', f'target: {args.target}, port: {args.port}, attack: {args.attack}, packet number: {args.count if args.count else "Infinite"},\n')

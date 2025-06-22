@@ -2,19 +2,12 @@ from src import show_banner
 from src.arg_parser import arg_parser
 from src import TargetValidator
 from src.dos import HTTPDos, SocketDos, TCP, UDP, DEFAULT_NUM_THREADS
-from src.utils import *
+from src.utils import resume
 
 
 def main():
     args = arg_parser()
     trying_connection(args)
-
-
-def resume(args):
-
-    color_text(
-        'yellow', f'target: {args.target}, port: {args.port}, attack: {args.attack}, packet number: {args.count if args.count else "Infinite"},\n')
-
 
 def trying_connection(args):
     resume(args)
