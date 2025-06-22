@@ -9,18 +9,18 @@ import string
 import time
 from threading import Thread
 from src.utils import color_text
-from src.config import TCP
+from src.config import TCP, DEFAULT_NUM_THREADS
 
 
 class HTTPDos():
 
-    def __init__(self, target_ip, target_port, protocol, http_method=None, udp_size_bytes=1024, thread_number=4):
-        self.target_ip = target_ip
-        self.target_port = target_port
-        self.protocol = protocol
-        self.http_method = http_method
-        self.udp_size_bytes = udp_size_bytes
-        self.thread_number = thread_number
+    def __init__(self, args):
+        self.target_ip = args.target
+        self.target_port = args.port
+        self.protocol = args.attack
+        self.http_method = args.http_method
+        self.threads = args.threads if args.threads is not None else DEFAULT_NUM_THREADS
+        self.monothread = args.monothread if args.monothread is not None else False
         self.ssl_available = False
         self.counter = itertools.count(1)
 
@@ -173,13 +173,11 @@ class HTTPDos():
         """
         Manage threads and choose attack method
         """
-        threads = []
         try:
             if self.protocol != False and self.protocol != '':
                 if self.protocol == 'http' or self.protocol == 'https':
-                    for _ in range(self.thread_number):
+                    for _ in range(self.threads):
                         thread = Thread(target=self.http_flood())
-                        threads.append(thread)
                         thread.start()
             else:
                 print('Bad method')
