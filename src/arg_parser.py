@@ -41,11 +41,8 @@ def arg_parser():
     )
 
     parser.add_argument(
-        "-m",
         "--method",
-        choices=['get', 'post'],
         type=str,
-        help="Choise your HTTP method"
     )
 
     parser.add_argument(
@@ -58,10 +55,17 @@ def arg_parser():
 
     parser.add_argument(
         "-t",
-        "--thread",
+        "--threads",
         type=int,
         default=None,
         help=f"Number of threads, default set to {DEFAULT_NUM_THREADS}"
+    )
+
+    parser.add_argument(
+        "--monothread",
+        type=int,
+        default=None,
+        help="Use a mono thread, usefull for dev in local"
     )
 
     args = parser.parse_args()
