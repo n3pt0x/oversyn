@@ -17,10 +17,6 @@ def resume(args):
 
 
 def trying_connection(args):
-    target = args.target
-    target_port = args.port
-    attack_type = args.attack
-    http_method = args.method
     resume(args)
 
     target_validator = TargetValidator(args)
@@ -28,29 +24,21 @@ def trying_connection(args):
 
     if target_validated:
         print('Packet sending ...')
-        attack(target, target_port, attack_type, http_method=http_method)
+        attack(args)
     else:
         print('End !')
 
 
-def attack(target, target_port, attack_type, http_method=None):
+def attack(args):
     """
     target
     target_port
     attack_type: attack method like: UDP, HTTP
     """
-    if attack_type == 'udp':
-        dos_attacks = SocketDos(target, target_port, UDP,
-                                thread_number=DEFAULT_NUM_THREADS)
-        return dos_attacks.start_attack()
-    elif attack_type == 'tcp':
-        dos_attacks = SocketDos(target, target_port, TCP,
-                                thread_number=DEFAULT_NUM_THREADS)
-        return dos_attacks.start_attack()
-    elif attack_type == 'http' or attack_type == 'https':
-        dos_attacks = HTTPDos(target, target_port, attack_type,
-                              http_method=http_method, thread_number=DEFAULT_NUM_THREADS)
-        return dos_attacks.start_attack()
+    if args.attack == 'udp' or args.attack == 'tcp':
+        return SocketDos(args).start_attack()
+    elif args.attack == 'http' or args.attack == 'https':
+        return HTTPDos(args).start_attack()
 
 
 if __name__ == "__main__":

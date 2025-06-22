@@ -41,7 +41,7 @@ def arg_parser():
     )
 
     parser.add_argument(
-        "--method",
+        "--http-method",
         type=str,
     )
 
@@ -71,6 +71,6 @@ def arg_parser():
     args = parser.parse_args()
 
     if (args.attack == 'http' or args.attack == 'https'):
-        args.method = input('Choice an HTTP method [GET, POST] : ').upper()
+        args.http_method = input('Choice an HTTP method [GET, POST] : ').upper()
 
     return args
