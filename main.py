@@ -9,6 +9,7 @@ def main():
     args = arg_parser()
     trying_connection(args)
 
+
 def trying_connection(args):
     resume(args)
 
@@ -28,9 +29,9 @@ def attack(args):
     target_port
     attack_type: attack method like: UDP, HTTP
     """
-    if args.attack == 'udp' or args.attack == 'tcp':
+    if args.attack in ('udp', 'tcp'):
         return SocketDos(args).start_attack()
-    elif args.attack == 'http' or args.attack == 'https':
+    elif args.attack in ('http', 'https'):
         return HTTPDos(args).start_attack()
 
 
