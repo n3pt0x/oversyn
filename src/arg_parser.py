@@ -1,6 +1,6 @@
 import argparse
 from src.config import DEFAULT_NUM_THREADS
-
+from src.utils import color_text
 
 def arg_parser():
 
@@ -70,7 +70,10 @@ def arg_parser():
 
     args = parser.parse_args()
 
-    if (args.attack == 'http' or args.attack == 'https'):
-        args.http_method = input('Choice an HTTP method [GET, POST] : ').upper()
-
+    if args.attack in ('http', 'https'):
+        while True:
+            if (method := input('Choose an HTTP method [GET, POST]: ').strip().upper()) in ('GET', 'POST'):
+                args.http_method = method
+                break
+            color_text('red', '[!] Only these methods are available [GET, POST]')
     return args
