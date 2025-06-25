@@ -65,7 +65,7 @@ def arg_parser():
         "--monothread",
         type=int,
         default=None,
-        help="Use a mono thread, usefull for dev in local"
+        help="Use a mono thread, usefull for local test"
     )
 
     args = parser.parse_args()
