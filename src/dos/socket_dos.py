@@ -64,9 +64,9 @@ class SocketDos():
 
             if self.monothread:
                 if self.protocol == TCP:
-                    return self.tcp_flood
+                    return self.tcp_flood()
                 elif self.protocol == UDP:
-                    return self.udp_flood
+                    return self.udp_flood()
 
             else:
                 for _ in range(self.threads):
