@@ -2,7 +2,6 @@ import socket
 import random
 import sys
 import itertools
-import time
 from threading import Thread
 from src.utils import color_text
 from src.config import TCP, UDP, DEFAULT_NUM_THREADS

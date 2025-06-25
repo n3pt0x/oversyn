@@ -115,15 +115,6 @@ class HTTPDos():
             sys.stdout.write(f'{request_nb} request send !\r\n')
             sys.stdout.flush()
 
-
-
-
-
-
-
-
-
-
     def get_http_request(self):
         random_ip = self.http_random_ip()
 

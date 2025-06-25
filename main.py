@@ -23,11 +23,6 @@ def trying_connection(args):
 
 
 def attack(args):
-    """
-    target
-    target_port
-    attack_type: attack method like: UDP, HTTP
-    """
     if args.attack in ('udp', 'tcp'):
         return SocketDos(args).start_attack()
     elif args.attack in ('http', 'https'):
