@@ -41,7 +41,6 @@ class HTTPDos():
 
         if self.protocol == 'https':
             self.ssl_available = self.test_ssl_connection()
-            print(self.ssl_available)
 
             if self.ssl_available:
                 color_text('green', '[+] Sending request\n')
@@ -49,7 +48,7 @@ class HTTPDos():
             else:
                 self.target_port = 80
                 if self.send_packet:
-                    color_text('blue', f'[*] {self.target_ip} on port {self.target_port} is available !\n')
+                    color_text('blue', f'[*] {self.target_ip} with HTTP on port {self.target_port} is available\n')
                     while True:
                         if (match := input(f"Do you want send packet to {self.target_ip} on port {self.target_port} ? [yes, no] : ").strip().lower()) in ('yes', 'no'):
                             if match == 'no':
@@ -102,7 +101,7 @@ class HTTPDos():
             return True  # SSL valid
         except:
             color_text(
-                'red', "\r\n[!] HTTPS isn't available, test with http !\r\n")
+                'red', f"\r\n[!] HTTPS on port {self.target_port} isn't available, test with http !\r\n")
             self.attack = 'http'  # if https is not valide, test on http port 80 by default
 
             return False

@@ -13,6 +13,7 @@ def color_text(color: str, text: str) -> str:
 
 
 def resume(args):
-
+    if args.http_method:
+        http_method = ' http method: ' + args.http_method + ','
     color_text(
-        'yellow', f'target: {args.target}, port: {args.port}, attack: {args.attack}, packet number: {args.count if args.count else "Infinite"},\n')
+        'cyan', f'target: {args.target}, port: {args.port}, attack: {args.attack},{http_method} packet number: {args.count if args.count else "Infinite"}\n')
