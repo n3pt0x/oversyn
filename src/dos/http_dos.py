@@ -41,6 +41,7 @@ class HTTPDos():
 
         if self.protocol == 'https':
             self.ssl_available = self.test_ssl_connection()
+            print(self.ssl_available)
 
             if self.ssl_available:
                 color_text('green', '[+] Sending request\n')
@@ -73,7 +74,7 @@ class HTTPDos():
     def send_packet(self):
         sock = socket.socket(socket.AF_INET, TCP)
         
-        if self.ssl_available == True:
+        if self.ssl_available:
             context = ssl.create_default_context()
 
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
