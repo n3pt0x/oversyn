@@ -1,7 +1,4 @@
-import multiprocessing
 import socket
-
-CPU_COUNT = multiprocessing.cpu_count()
 
 DEFAULT_NUM_THREADS = 100
 

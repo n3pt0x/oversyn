@@ -17,7 +17,6 @@ def trying_connection(args):
     target_validated = target_validator.validate()
 
     if target_validated:
-        print('Packet sending ...')
         attack(args)
     else:
         print('End !')
