@@ -1,6 +1,7 @@
 import socket
 
 DEFAULT_NUM_THREADS = 50
+SIZE_BYTE = 1024
 
 TCP = socket.SOCK_STREAM
 UDP = socket.SOCK_DGRAM

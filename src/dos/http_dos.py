@@ -84,7 +84,7 @@ class HTTPDos():
                 self.send_packet()
                 self.count_requests()
         except KeyboardInterrupt:
-            color_text('red', "\n[!] Interrupted by user. Exiting cleanly.")
+            color_text('red', "\n[!] Interrupted by user.")
             sys.exit(0)
 
     def send_packet(self):
