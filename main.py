@@ -7,26 +7,26 @@ from src.utils import resume
 
 def main():
     args = arg_parser()
-    trying_connection(args)
+    attack(args)
+
+
+def attack(args):
+    resume(args)
+
+    if trying_connection(args):
+        if args.attack in ('udp', 'tcp'):
+            return SocketDos(args).start_attack()
+        elif args.attack in ('http', 'https'):
+            return HTTPDos(args).start_attack()
 
 
 def trying_connection(args):
-    resume(args)
-
     target_validator = TargetValidator(args)
     target_validated = target_validator.validate()
 
     if target_validated:
-        attack(args)
-    else:
-        print('End !')
-
-
-def attack(args):
-    if args.attack in ('udp', 'tcp'):
-        return SocketDos(args).start_attack()
-    elif args.attack in ('http', 'https'):
-        return HTTPDos(args).start_attack()
+        return True
+    return False
 
 
 if __name__ == "__main__":
